@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="ContainerOS — A POSIX Process & Oracle RDBMS Management Dashboard" />
+  <title>ContainerOS — Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/reset.css" />
+  <link rel="stylesheet" href="styles/tokens.css" />
+  <link rel="stylesheet" href="styles/layout.css" />
+  <link rel="stylesheet" href="styles/components.css" />
+  <link rel="stylesheet" href="styles/animations.css" />
+</head>
+<body data-theme="dark">
+
+  <!-- ── NAV BAR ── -->
+  <nav class="navbar" id="navbar" role="navigation" aria-label="Main Navigation">
+    <div class="navbar__inner">
+      <a href="#" class="navbar__logo" id="nav-logo" aria-label="ContainerOS Home">
+        <span class="logo-mark">⬡</span>
+        <span class="logo-text">ContainerOS</span>
+      </a>
+      <ul class="navbar__links" role="list">
+        <li><a href="#" class="nav-link active" data-view="dashboard" id="nav-dashboard">Dashboard</a></li>
+        <li><a href="#" class="nav-link" data-view="containers" id="nav-containers">Containers</a></li>
+        <li><a href="#" class="nav-link" data-view="processes" id="nav-processes">Processes</a></li>
+        <li><a href="#" class="nav-link" data-view="database" id="nav-database">Database</a></li>
+        <li><a href="#" class="nav-link" data-view="logs" id="nav-logs">Logs</a></li>
+      </ul>
+      <div class="navbar__actions">
+        <button class="btn-icon" id="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+          <span class="icon" id="theme-icon">☀</span>
+        </button>
+        <button class="btn btn--primary btn--sm" id="btn-new-container">
+          <span class="btn__icon">+</span>
+          <span>New Container</span>
+        </button>
+      </div>
+      <button class="navbar__hamburger" id="hamburger" aria-label="Open menu" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ── MAIN APP ── -->
+  <main class="app-root" id="app-root" role="main">
+
+    <!-- ── VIEW: DASHBOARD ── -->
+    <section class="view active" data-view="dashboard" id="view-dashboard" aria-label="Dashboard">
+
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero__glow" aria-hidden="true"></div>
+        <div class="hero__content">
+          <p class="hero__eyebrow">POSIX Process & Oracle RDBMS Engine</p>
+          <h1 class="hero__title">
+            Container<span class="hero__title--accent">OS</span>
+          </h1>
+          <p class="hero__subtitle">
+            A production-grade container orchestration system powered by low-level C systems programming and Oracle Database persistence — built for engineers who care about what's underneath.
+          </p>
+          <div class="hero__actions">
+            <button class="btn btn--primary btn--lg" id="hero-launch-btn">Launch Container</button>
+            <button class="btn btn--ghost btn--lg" id="hero-docs-btn">Architecture →</button>
+          </div>
+        </div>
+        <div class="hero__visual" aria-hidden="true">
+          <div class="terminal" id="hero-terminal">
+            <div class="terminal__bar">
+              <span class="terminal__dot terminal__dot--red"></span>
+              <span class="terminal__dot terminal__dot--yellow"></span>
+              <span class="terminal__dot terminal__dot--green"></span>
+              <span class="terminal__title">containeros-runtime</span>
+            </div>
+            <div class="terminal__body" id="terminal-body"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Metric Cards -->
+      <section class="section" aria-labelledby="metrics-title">
+        <h2 class="sr-only" id="metrics-title">System Metrics</h2>
+        <div class="metric-grid" id="metric-grid" role="list"></div>
+      </section>
+
+      <!-- System Snapshot -->
+      <section class="section" aria-labelledby="snapshot-title">
+        <div class="section__header">
+          <h2 class="section__title" id="snapshot-title">System Snapshot</h2>
+          <span class="badge badge--live" aria-label="Live data">● LIVE</span>
+        </div>
+        <div class="snapshot-grid">
+          <div class="card glass" id="cpu-chart-card" aria-label="CPU Utilization Chart">
+            <p class="card__label">CPU Utilization</p>
+            <div class="sparkline-container" aria-hidden="true">
+              <canvas id="cpu-canvas" width="300" height="80"></canvas>
+            </div>
+            <p class="card__value" id="cpu-value">--</p>
+          </div>
+          <div class="card glass" id="mem-chart-card" aria-label="Memory Usage Chart">
+            <p class="card__label">Memory Usage</p>
+            <div class="sparkline-container" aria-hidden="true">
+              <canvas id="mem-canvas" width="300" height="80"></canvas>
+            </div>
+            <p class="card__value" id="mem-value">--</p>
+          </div>
+          <div class="card glass" id="proc-chart-card" aria-label="Active Processes Chart">
+            <p class="card__label">Active Processes</p>
+            <div class="sparkline-container" aria-hidden="true">
+              <canvas id="proc-canvas" width="300" height="80"></canvas>
+            </div>
+            <p class="card__value" id="proc-value">--</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- Architecture Pillars -->
+      <section class="section" aria-labelledby="arch-title">
+        <div class="section__header">
+          <h2 class="section__title" id="arch-title">Architecture</h2>
+          <p class="section__sub">Four pillars. One system.</p>
+        </div>
+        <div class="pillar-grid" id="pillar-grid" role="list"></div>
+      </section>
+
+      <!-- Recent containers -->
+      <section class="section" aria-labelledby="recent-title">
+        <div class="section__header">
+          <h2 class="section__title" id="recent-title">Recent Containers</h2>
+          <a href="#" class="link" data-view="containers" id="view-all-containers">View all →</a>
+        </div>
+        <div class="table-wrapper" role="region" aria-label="Recent containers table">
+          <table class="data-table" id="recent-table" aria-label="Recent containers">
+            <thead>
+              <tr>
+                <th scope="col">ID</th>
+                <th scope="col">Name</th>
+                <th scope="col">Command</th>
+                <th scope="col">Status</th>
+                <th scope="col">PID</th>
+                <th scope="col">Action</th>
+              </tr>
+            </thead>
+            <tbody id="recent-table-body"></tbody>
+          </table>
+        </div>
+      </section>
+    </section>
+
+    <!-- ── VIEW: CONTAINERS ── -->
+    <section class="view" data-view="containers" id="view-containers" aria-label="Containers">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Containers</h1>
+          <p class="page-sub">Manage POSIX process containers</p>
+        </div>
+        <div class="page-header__actions">
+          <div class="search-box">
+            <span class="search-box__icon" aria-hidden="true">⌕</span>
+            <input type="search" class="search-box__input" id="container-search" placeholder="Filter containers…" aria-label="Search containers" />
+          </div>
+          <div class="filter-tabs" role="tablist" aria-label="Container status filter">
+            <button class="filter-tab active" role="tab" aria-selected="true" data-filter="all" id="filter-all">All</button>
+            <button class="filter-tab" role="tab" aria-selected="false" data-filter="RUNNING" id="filter-running">Running</button>
+            <button class="filter-tab" role="tab" aria-selected="false" data-filter="STOPPED" id="filter-stopped">Stopped</button>
+            <button class="filter-tab" role="tab" aria-selected="false" data-filter="EXITED" id="filter-exited">Exited</button>
+            <button class="filter-tab" role="tab" aria-selected="false" data-filter="FAILED" id="filter-failed">Failed</button>
+          </div>
+        </div>
+      </div>
+      <div class="container-grid" id="container-grid" role="list" aria-label="Container list"></div>
+    </section>
+
+    <!-- ── VIEW: PROCESSES ── -->
+    <section class="view" data-view="processes" id="view-processes" aria-label="Processes">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Processes</h1>
+          <p class="page-sub">Real-time POSIX process tree</p>
+        </div>
+        <div class="page-header__actions">
+          <button class="btn btn--secondary btn--sm" id="refresh-proc">↻ Refresh</button>
+          <button class="btn btn--primary btn--sm" id="btn-spawn">Spawn Process</button>
+        </div>
+      </div>
+      <div class="process-layout">
+        <div class="process-tree-panel">
+          <h2 class="panel-title">Process Tree</h2>
+          <div class="process-tree" id="process-tree" role="tree" aria-label="Process tree"></div>
+        </div>
+        <div class="process-detail-panel" id="process-detail-panel">
+          <h2 class="panel-title">Process Detail</h2>
+          <div id="process-detail-content">
+            <div class="empty-state">
+              <p class="empty-state__icon" aria-hidden="true">⬡</p>
+              <p class="empty-state__text">Select a process to inspect it</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ── VIEW: DATABASE ── -->
+    <section class="view" data-view="database" id="view-database" aria-label="Database">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Database</h1>
+          <p class="page-sub">Oracle Schema, PL/SQL & Concurrency Engine</p>
+        </div>
+      </div>
+      <div class="db-tabs" role="tablist" aria-label="Database views">
+        <button class="db-tab active" role="tab" aria-selected="true" data-dbtab="schema" id="db-tab-schema">Schema</button>
+        <button class="db-tab" role="tab" aria-selected="false" data-dbtab="procedures" id="db-tab-procedures">PL/SQL Procedures</button>
+        <button class="db-tab" role="tab" aria-selected="false" data-dbtab="concurrency" id="db-tab-concurrency">Concurrency Demo</button>
+        <button class="db-tab" role="tab" aria-selected="false" data-dbtab="triggers" id="db-tab-triggers">Triggers</button>
+      </div>
+      <div id="db-content-panel"></div>
+    </section>
+
+    <!-- ── VIEW: LOGS ── -->
+    <section class="view" data-view="logs" id="view-logs" aria-label="Logs">
+      <div class="page-header">
+        <div>
+          <h1 class="page-title">Audit Logs</h1>
+          <p class="page-sub">Container lifecycle events &amp; Oracle trigger records</p>
+        </div>
+        <div class="page-header__actions">
+          <select class="select-input" id="log-filter-container" aria-label="Filter logs by container">
+            <option value="all">All Containers</option>
+          </select>
+          <button class="btn btn--ghost btn--sm" id="clear-logs">Clear</button>
+        </div>
+      </div>
+      <div class="log-stream" id="log-stream" role="log" aria-live="polite" aria-label="Log stream"></div>
+    </section>
+
+  </main>
+
+  <!-- ── MODAL: CREATE CONTAINER ── -->
+  <div class="modal-overlay" id="modal-overlay" role="dialog" aria-modal="true" aria-labelledby="modal-title" hidden>
+    <div class="modal glass" id="modal">
+      <div class="modal__header">
+        <h2 class="modal__title" id="modal-title">Launch Container</h2>
+        <button class="btn-icon modal__close" id="modal-close" aria-label="Close modal">✕</button>
+      </div>
+      <form class="modal__body" id="create-container-form" novalidate>
+        <div class="form-group">
+          <label class="form-label" for="input-name">Container Name <span aria-hidden="true" class="required">*</span></label>
+          <input class="form-input" type="text" id="input-name" name="name" placeholder="e.g. web-server-01" required autocomplete="off" aria-required="true" />
+          <span class="form-error" id="error-name" role="alert" aria-live="polite"></span>
+        </div>
+        <div class="form-group">
+          <label class="form-label" for="input-cmd">Command <span aria-hidden="true" class="required">*</span></label>
+          <input class="form-input" type="text" id="input-cmd" name="cmd" placeholder="e.g. python3 -m http.server 8080" required autocomplete="off" aria-required="true" />
+          <span class="form-error" id="error-cmd" role="alert" aria-live="polite"></span>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="input-cpu">CPU Limit (sec)</label>
+            <input class="form-input" type="number" id="input-cpu" name="cpu" placeholder="0 = unlimited" min="0" value="0" />
+          </div>
+          <div class="form-group">
+            <label class="form-label" for="input-mem">Memory Limit (MB)</label>
+            <input class="form-input" type="number" id="input-mem" name="mem" placeholder="0 = unlimited" min="0" value="0" />
+          </div>
+        </div>
+        <div class="modal__footer">
+          <button type="button" class="btn btn--ghost" id="modal-cancel">Cancel</button>
+          <button type="submit" class="btn btn--primary" id="modal-submit">
+            <span class="btn__spinner" hidden aria-hidden="true">◌</span>
+            <span class="btn__label">Launch</span>
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- ── TOAST NOTIFICATIONS ── -->
+  <div class="toast-container" id="toast-container" role="status" aria-live="polite" aria-label="Notifications"></div>
+
+  <script type="module" src="js/app.js"></script>
+</body>
+</html>
