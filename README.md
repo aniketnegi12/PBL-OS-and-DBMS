@@ -75,3 +75,16 @@ container_os/
 ├── Makefile                 # C build configuration
 └── README.md                # Project documentation & Viva guide
 ```
+
+---
+
+## 3. Full DBMS model & ER diagram
+
+The complete 9-table Oracle model (users, images, containers, processes,
+namespaces, resource_limits, metrics, events, logs) lives in
+[`db/schema_full.sql`](db/schema_full.sql) with seed/demo/teardown scripts —
+see [`db/README.md`](db/README.md) for how it relates to the original
+3-table set.
+
+- [ER diagram (Mermaid)](docs/er-diagram.md) · [browser viewer](docs/er-diagram.html) · [PNG for the report](docs/er-diagram.png)
+- [System architecture & command→data flow](docs/architecture.md)

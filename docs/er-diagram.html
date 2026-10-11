@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ContainerLite — ER Diagram</title>
+<style>
+  :root {
+    --bg:#050507; --panel:rgba(255,255,255,.045); --ink:#f5f5f7;
+    --dim:#86868b; --blue:#0a84ff; --green:#30d158;
+  }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body {
+    background:var(--bg); color:var(--ink);
+    font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-serif;
+    min-height:100vh;
+  }
+  header {
+    padding:28px 32px 18px; border-bottom:1px solid rgba(255,255,255,.08);
+    display:flex; align-items:baseline; gap:14px; flex-wrap:wrap;
+  }
+  header h1 { font-size:22px; font-weight:700; letter-spacing:-.02em; }
+  header .sub { color:var(--dim); font-size:13px; }
+  header .dot { color:var(--green); }
+  main { padding:26px 32px 40px; }
+  .legend {
+    display:flex; gap:18px; flex-wrap:wrap; color:var(--dim); font-size:12px;
+    margin-bottom:18px;
+  }
+  .legend b { color:var(--ink); font-weight:600; }
+  .card {
+    background:var(--panel); border:1px solid rgba(255,255,255,.09);
+    border-radius:18px; padding:22px 26px; overflow-x:auto;
+  }
+  .mermaid { display:flex; justify-content:center; }
+  .mermaid svg { max-width:100%; height:auto; }
+  footer { color:var(--dim); font-size:12px; padding:16px 32px 30px; }
+  @media print { body { background:#fff; color:#000; } }
+</style>
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({
+    startOnLoad: true,
+    theme: "dark",
+    themeVariables: {
+      darkMode: true, background: "#050507",
+      primaryColor: "#0a84ff22", primaryBorderColor: "#0a84ff",
+      primaryTextColor: "#f5f5f7", lineColor: "#86868b",
+      fontSize: "13px"
+    },
+    er: { diagramPadding: 18, entityPadding: 14, minEntityWidth: 130 }
+  });
+</script>
+</head>
+<body>
+<header>
+  <h1>ContainerLite</h1>
+  <span class="sub">Entity-Relationship Diagram <span class="dot">●</span>
+    OS + DBMS PBL · Sem-5</span>
+</header>
+<main>
+  <div class="legend">
+    <span><b>──||—o&lt;</b> one-to-many</span>
+    <span><b>──||—||</b> one-to-one</span>
+    <span><b>PK</b> primary key</span>
+    <span><b>FK</b> foreign key</span>
+    <span><b>UK</b> unique</span>
+  </div>
+  <div class="card">
+    <pre class="mermaid">
+erDiagram
+    USERS ||--o{ CONTAINERS : "owns"
+    IMAGES ||--o{ CONTAINERS : "instantiated as"
+    CONTAINERS ||--o{ PROCESSES : "runs"
+    PROCESSES |o--o{ PROCESSES : "parent of"
+    CONTAINERS ||--|| RESOURCE_LIMITS : "capped by"
+    CONTAINERS ||--o{ NAMESPACES : "isolated by"
+    CONTAINERS ||--o{ METRICS : "sampled in"
+    CONTAINERS ||--o{ EVENTS : "audited in"
+    PROCESSES ||--o{ LOGS : "emits"
+
+    USERS {
+        number user_id PK "seq_users"
+        varchar2 username UK "CLI login"
+        varchar2 full_name
+        varchar2 email
+        varchar2 role "admin|student|viewer"
+        timestamp created_at
+    }
+    IMAGES {
+        number image_id PK "seq_images"
+        varchar2 name UK
+        varchar2 tag UK "unique with name"
+        varchar2 entrypoint
+        number size_bytes
+        varchar2 description
+        timestamp created_at
+    }
+    CONTAINERS {
+        number container_id PK "seq_containers"
+        varchar2 name UK "unique name"
+        number image_id FK "template"
+        number owner_id FK "owner"
+        varchar2 status "CREATED..FAILED"
+        number pid "OS pid of init"
+        varchar2 hostname "UTS namespace"
+        number restart_count
+        timestamp started_at
+        timestamp stopped_at
+        number exit_code "0-255"
+    }
+    PROCESSES {
+        number process_id PK "seq_processes"
+        number container_id FK
+        number parent_process_id FK "self-tree"
+        number os_pid "Linux pid"
+        varchar2 command
+        varchar2 state "RUNNING..DEAD"
+        char is_init "Y = root"
+        timestamp start_time
+        timestamp end_time
+        number exit_code
+    }
+    NAMESPACES {
+        number ns_id PK "seq_namespaces"
+        number container_id FK
+        varchar2 ns_type "PID|NET|MNT|IPC|UTS|USER"
+        number ns_inode "proc ns inode"
+        timestamp created_at
+    }
+    RESOURCE_LIMITS {
+        number limit_id PK "seq_rlimits"
+        number container_id FK "1 per container"
+        varchar2 cgroup_path
+        number memory_limit_bytes "memory.max"
+        number memory_swap_bytes
+        number cpu_shares
+        number cpu_quota_us
+        number cpu_period_us
+        number pids_max
+        number nofile_limit
+    }
+    METRICS {
+        number metric_id PK "seq_metrics"
+        number container_id FK
+        timestamp captured_at
+        number cpu_usage_pct "0-100"
+        number memory_usage_bytes
+        number rx_bytes
+        number tx_bytes
+        number pids_count
+    }
+    EVENTS {
+        number event_id PK "seq_events"
+        number container_id FK
+        varchar2 event_type "trigger-written"
+        varchar2 old_status
+        varchar2 new_status
+        varchar2 actor "user|system"
+        varchar2 message
+        timestamp occurred_at
+    }
+    LOGS {
+        number log_id PK "seq_logs"
+        number process_id FK
+        varchar2 stream "STDOUT|STDERR"
+        varchar2 line_text
+        timestamp logged_at
+    }
+    </pre>
+  </div>
+</main>
+<footer>ContainerOS · db/schema_full.sql · 9 tables · 11 triggers · 4 views · 1 procedure · 1 function</footer>
+</body>
+</html>
